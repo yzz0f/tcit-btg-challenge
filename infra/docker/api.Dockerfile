@@ -3,8 +3,10 @@ FROM node:22-alpine AS builder
 WORKDIR /workspace
 
 # Capa de dependencias: solo se invalida cuando cambian los manifiestos.
+# Se copian todos los del workspace para que npm ci instale las deps de cada paquete.
 COPY package.json package-lock.json ./
 COPY packages/shared/package.json packages/shared/
+COPY apps/api/package.json apps/api/
 RUN npm ci
 
 COPY . .
