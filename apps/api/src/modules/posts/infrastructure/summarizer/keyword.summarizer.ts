@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { POST_LIMITS } from '@tcit/shared';
-import { SummarizerPort } from '../../domain/summarizer.port';
+import { PostSummary, SummarizerPort } from '../../domain/summarizer.port';
 
 /** Palabras sin valor semántico que no deben salir como palabras clave. */
 const STOPWORDS = new Set([
@@ -58,37 +58,35 @@ const STOPWORDS = new Set([
 ]);
 
 const MIN_KEYWORD_LENGTH = 4;
-const MAX_KEYWORDS = 5;
-const SENTENCE_MAX_LENGTH = 140;
-const KEYWORDS_LABEL = 'Palabras clave: ';
 
 /**
- * Genera el resumen combinando la primera oración de la descripción con las
- * palabras clave más frecuentes. Es determinista, sin dependencias externas y
- * reemplazable por otro adaptador del puerto (por ejemplo un LLM).
+ * Genera el resumen y las palabras clave a partir de la descripción: el resumen es la
+ * primera oración, y las palabras clave son los términos más frecuentes del texto.
+ * Es determinista, sin dependencias externas y reemplazable por otro adaptador del puerto
+ * (por ejemplo un LLM).
  */
 @Injectable()
 export class KeywordSummarizer extends SummarizerPort {
-  async summarize(text: string): Promise<string> {
+  async summarize(text: string): Promise<PostSummary> {
     const normalized = text.replace(/\s+/g, ' ').trim();
 
     if (!normalized) {
-      return '';
+      return { summary: '', keywords: [] };
     }
 
-    const sentence = this.firstSentence(normalized);
-    const keywords = this.keywords(normalized);
-    const summary = keywords.length
-      ? `${sentence} ${KEYWORDS_LABEL}${keywords.join(', ')}`
-      : sentence;
-
-    return this.truncate(summary, POST_LIMITS.summaryMaxLength);
+    return {
+      summary: this.firstSentence(normalized),
+      keywords: this.keywords(normalized),
+    };
   }
 
   private firstSentence(text: string): string {
     const [sentence] = text.split(/(?<=[.!?])\s/);
+    const summary = sentence ?? text;
 
-    return this.truncate(sentence ?? text, SENTENCE_MAX_LENGTH);
+    return summary.length <= POST_LIMITS.summaryMaxLength
+      ? summary
+      : `${summary.slice(0, POST_LIMITS.summaryMaxLength - 1).trimEnd()}…`;
   }
 
   private keywords(text: string): string[] {
@@ -102,13 +100,27 @@ export class KeywordSummarizer extends SummarizerPort {
       frequencies.set(word, (frequencies.get(word) ?? 0) + 1);
     }
 
-    return [...frequencies.entries()]
+    const ranked = [...frequencies.entries()]
       .sort(([wordA, countA], [wordB, countB]) => countB - countA || wordA.localeCompare(wordB))
-      .slice(0, MAX_KEYWORDS)
       .map(([word]) => word);
+
+    return this.fitToColumn(ranked.slice(0, POST_LIMITS.maxKeywords));
   }
 
-  private truncate(text: string, maxLength: number): string {
-    return text.length <= maxLength ? text : `${text.slice(0, maxLength - 1).trimEnd()}…`;
+  /** Descarta las últimas palabras si no caben en la columna que las persiste. */
+  private fitToColumn(keywords: string[]): string[] {
+    const fitting: string[] = [];
+
+    for (const keyword of keywords) {
+      const length = [...fitting, keyword].join(',').length;
+
+      if (length > POST_LIMITS.keywordsMaxLength) {
+        break;
+      }
+
+      fitting.push(keyword);
+    }
+
+    return fitting;
   }
 }

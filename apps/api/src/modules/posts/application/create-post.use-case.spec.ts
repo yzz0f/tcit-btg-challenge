@@ -20,8 +20,8 @@ class InMemoryPostRepository extends PostRepositoryPort {
 }
 
 class FakeSummarizer extends SummarizerPort {
-  async summarize(text: string): Promise<string> {
-    return `resumen de: ${text}`;
+  async summarize(text: string) {
+    return { summary: `resumen de: ${text}`, keywords: ['clave-1', 'clave-2'] };
   }
 }
 
@@ -34,10 +34,11 @@ describe('CreatePost', () => {
     useCase = new CreatePost(repository, new FakeSummarizer());
   });
 
-  it('persiste el post con el resumen generado', async () => {
+  it('persiste el post con el resumen y las palabras clave generadas', async () => {
     const post = await useCase.execute({ name: 'Post 1', description: 'Hola como están' });
 
     expect(post.summary).toBe('resumen de: Hola como están');
+    expect(post.keywords).toEqual(['clave-1', 'clave-2']);
     expect(repository.saved).toEqual([post]);
   });
 

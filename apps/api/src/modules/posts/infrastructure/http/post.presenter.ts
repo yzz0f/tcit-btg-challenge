@@ -8,6 +8,7 @@ export function toPostResponse(post: Post): PostContract {
     name: post.name,
     description: post.description,
     summary: post.summary,
+    keywords: post.keywords,
     createdAt: post.createdAt.toISOString(),
   };
 }

@@ -8,6 +8,7 @@ const existingPost = Post.create({
   name: 'Ya existe',
   description: 'Contenido',
   summary: 'Resumen',
+  keywords: ['clave'],
 });
 
 function seeder(existing: Post[]) {

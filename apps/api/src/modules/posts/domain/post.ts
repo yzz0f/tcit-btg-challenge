@@ -10,16 +10,23 @@ export class Post {
     readonly name: string,
     readonly description: string,
     readonly summary: string,
+    readonly keywords: string[],
     readonly createdAt: Date,
   ) {}
 
   /** Crea un post nuevo: el id y la fecha de creación los define el dominio. */
-  static create(input: { name: string; description: string; summary: string }): Post {
+  static create(input: {
+    name: string;
+    description: string;
+    summary: string;
+    keywords: string[];
+  }): Post {
     return new Post(
       randomUUID(),
       input.name.trim(),
       input.description.trim(),
       input.summary,
+      input.keywords,
       new Date(),
     );
   }
@@ -30,8 +37,16 @@ export class Post {
     name: string;
     description: string;
     summary: string;
+    keywords: string[];
     createdAt: Date;
   }): Post {
-    return new Post(input.id, input.name, input.description, input.summary, input.createdAt);
+    return new Post(
+      input.id,
+      input.name,
+      input.description,
+      input.summary,
+      input.keywords,
+      input.createdAt,
+    );
   }
 }

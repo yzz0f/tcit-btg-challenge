@@ -12,6 +12,7 @@ const post = Post.rehydrate({
   name: 'Post 1',
   description: 'Contenido',
   summary: 'Resumen',
+  keywords: ['nube', 'servidor'],
   createdAt: new Date('2026-07-29T12:00:00.000Z'),
 });
 
@@ -47,6 +48,7 @@ describe('PostsController', () => {
         name: 'Post 1',
         description: 'Contenido',
         summary: 'Resumen',
+        keywords: ['nube', 'servidor'],
         createdAt: '2026-07-29T12:00:00.000Z',
       },
     ]);
