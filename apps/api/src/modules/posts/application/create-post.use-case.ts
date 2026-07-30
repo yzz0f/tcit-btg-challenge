@@ -16,8 +16,8 @@ export class CreatePost {
   ) {}
 
   async execute(command: CreatePostCommand): Promise<Post> {
-    const summary = await this.summarizer.summarize(command.description);
-    const post = Post.create({ ...command, summary });
+    const { summary, keywords } = await this.summarizer.summarize(command.description);
+    const post = Post.create({ ...command, summary, keywords });
 
     await this.posts.save(post);
 

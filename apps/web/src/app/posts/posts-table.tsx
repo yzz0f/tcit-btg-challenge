@@ -4,6 +4,10 @@ import { deletePost, selectFilter, selectStatus, selectVisiblePosts } from './po
 
 const dateFormat = new Intl.DateTimeFormat('es', { dateStyle: 'medium', timeStyle: 'short' });
 
+/**
+ * El resumen y las palabras clave se generan y se guardan, pero no se muestran:
+ * el listado sigue el layout del challenge (nombre, descripción y acción).
+ */
 function PostRow({ post }: { post: Post }) {
   const dispatch = useAppDispatch();
 
@@ -14,7 +18,6 @@ function PostRow({ post }: { post: Post }) {
         <span className="date">{dateFormat.format(new Date(post.createdAt))}</span>
       </td>
       <td>{post.description}</td>
-      <td className="summary">{post.summary}</td>
       <td>
         <button
           type="button"
@@ -52,7 +55,6 @@ export function PostsTable() {
         <tr>
           <th scope="col">Nombre</th>
           <th scope="col">Descripción</th>
-          <th scope="col">Resumen</th>
           <th scope="col">Acción</th>
         </tr>
       </thead>

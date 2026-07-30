@@ -4,38 +4,49 @@ import { KeywordSummarizer } from './keyword.summarizer';
 describe('KeywordSummarizer', () => {
   const summarizer = new KeywordSummarizer();
 
-  it('devuelve la primera oración con las palabras clave', async () => {
-    const summary = await summarizer.summarize(
+  it('usa la primera oración como resumen, sin las palabras clave', async () => {
+    const { summary } = await summarizer.summarize(
       'El despliegue usa contenedores. Los contenedores simplifican el despliegue en la nube.',
     );
 
-    expect(summary).toContain('El despliegue usa contenedores.');
-    expect(summary).toContain('Palabras clave: ');
-    expect(summary).toContain('contenedores');
-    expect(summary).toContain('despliegue');
+    expect(summary).toBe('El despliegue usa contenedores.');
   });
 
-  it('ordena las palabras clave por frecuencia', async () => {
-    const summary = await summarizer.summarize('nube nube nube servidor servidor contenedor');
-    const keywords = summary.split('Palabras clave: ')[1];
+  it('devuelve las palabras clave como lista ordenada por frecuencia', async () => {
+    const { keywords } = await summarizer.summarize('nube nube nube servidor servidor contenedor');
 
-    expect(keywords.startsWith('nube, servidor, contenedor')).toBe(true);
+    expect(keywords).toEqual(['nube', 'servidor', 'contenedor']);
   });
 
-  it('ignora palabras vacías y muy cortas al elegir las palabras clave', async () => {
-    const summary = await summarizer.summarize('Esto es para todos los que están con la nube');
-    const keywords = summary.split('Palabras clave: ')[1].split(', ');
+  it('ignora palabras vacías y muy cortas', async () => {
+    const { keywords } = await summarizer.summarize('Esto es para todos los que están con la nube');
 
     expect(keywords).toEqual(['nube']);
   });
 
-  it('respeta el límite de longitud del resumen', async () => {
-    const summary = await summarizer.summarize('palabra '.repeat(200));
+  it('no devuelve más palabras clave que el límite del contrato', async () => {
+    const { keywords } = await summarizer.summarize(
+      'nube servidor contenedor despliegue migracion resumen entidad puerto adaptador',
+    );
+
+    expect(keywords).toHaveLength(POST_LIMITS.maxKeywords);
+  });
+
+  it('respeta el largo de la columna que guarda las palabras clave', async () => {
+    const { keywords } = await summarizer.summarize(
+      Array.from({ length: 5 }, (_, i) => `${'palabra'.repeat(10)}${i}`).join(' '),
+    );
+
+    expect(keywords.join(',').length).toBeLessThanOrEqual(POST_LIMITS.keywordsMaxLength);
+  });
+
+  it('respeta el largo del resumen', async () => {
+    const { summary } = await summarizer.summarize('palabra '.repeat(200));
 
     expect(summary.length).toBeLessThanOrEqual(POST_LIMITS.summaryMaxLength);
   });
 
-  it('devuelve vacío si no hay descripción', async () => {
-    expect(await summarizer.summarize('   ')).toBe('');
+  it('devuelve resumen vacío y sin palabras clave si no hay descripción', async () => {
+    expect(await summarizer.summarize('   ')).toEqual({ summary: '', keywords: [] });
   });
 });

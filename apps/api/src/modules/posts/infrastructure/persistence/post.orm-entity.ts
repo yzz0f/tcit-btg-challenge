@@ -17,6 +17,10 @@ export class PostOrmEntity {
   @Column({ type: 'nvarchar', length: POST_LIMITS.summaryMaxLength })
   summary!: string;
 
+  /** Palabras clave unidas por coma: SQL Server no tiene tipo lista. */
+  @Column({ type: 'nvarchar', length: POST_LIMITS.keywordsMaxLength, default: '' })
+  keywords!: string;
+
   @Column({ type: 'datetime2', precision: 3 })
   createdAt!: Date;
 }
