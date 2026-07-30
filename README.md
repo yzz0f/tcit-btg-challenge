@@ -108,7 +108,8 @@ curl -X POST http://localhost:3000/api/posts \
   "id": "349c31d4-b364-46bc-bed9-2c7bf450c736",
   "name": "Despliegue",
   "description": "El despliegue usa contenedores en la nube.",
-  "summary": "El despliegue usa contenedores en la nube. Palabras clave: contenedores, despliegue, nube",
+  "summary": "El despliegue usa contenedores en la nube.",
+  "keywords": ["contenedores", "despliegue", "nube"],
   "createdAt": "2026-07-30T03:03:49.688Z"
 }
 ```
@@ -118,8 +119,14 @@ curl -X POST http://localhost:3000/api/posts \
 - El módulo `posts` sigue una **arquitectura hexagonal**: los casos de uso dependen de los
   puertos `PostRepositoryPort` y `SummarizerPort`, y los adaptadores concretos
   (`TypeOrmPostRepository`, `KeywordSummarizer`) se enchufan en `posts.module.ts`.
-- El `summary` se genera solo al crear el post: primera oración de la descripción más las
-  palabras clave más frecuentes. Cambiarlo por un LLM implica un adaptador nuevo del puerto.
+- Al crear el post se generan y se guardan dos campos: `summary` (primera oración de la
+  descripción) y `keywords` (los términos más frecuentes). Cambiarlo por un LLM implica un
+  adaptador nuevo del puerto, sin tocar el dominio.
+- `keywords` se persiste en una sola columna `nvarchar` con los términos separados por coma
+  —SQL Server no tiene tipo lista— pero el contrato del API lo expone siempre como `string[]`.
+  La conversión vive en el repositorio.
+- El resumen y las palabras clave **se guardan pero no se muestran** en el listado, que sigue
+  el layout del challenge (nombre, descripción y acción).
 - El esquema lo definen las **migraciones de TypeORM** (`synchronize` está desactivado) y se
   aplican al arrancar la API, así que el contenedor queda listo sin pasos manuales.
 
@@ -139,7 +146,8 @@ mano en ningún lado. Los datos viven en
 Pantalla única con las cuatro funcionalidades del challenge:
 
 - **Crear** — formulario de nombre y descripción; el resumen lo genera el backend.
-- **Listar** — tabla con nombre, fecha, descripción y el resumen generado.
+- **Listar** — tabla con nombre, fecha, descripción y la acción. El resumen y las palabras
+  clave se generan y se guardan, pero no se muestran.
 - **Eliminar** — acción por fila, que actualiza el estado sin recargar la lista.
 - **Filtrar** — búsqueda **local** por nombre, sin llamar al API, con el contador
   `visibles de total`.
