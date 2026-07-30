@@ -14,6 +14,7 @@ apps/
       infrastructure/   repositorio TypeORM, summarizer, controlador y DTOs
     src/migrations/     migraciones de TypeORM
   web/       Vite + React + Redux Toolkit
+    src/app/posts/      slice, formulario, filtro y tabla de posts
 packages/
   shared/    @tcit/shared — tipos y contratos compartidos entre api y web
 infra/
@@ -124,7 +125,7 @@ curl -X POST http://localhost:3000/api/posts \
 
 ## Datos iniciales (seeder)
 
-Con `SEED_ON_BOOT=true` (valor por defecto en compose), la API carga cuatro posts de ejemplo
+Con `SEED_ON_BOOT=true` (valor por defecto en compose), la API carga diez posts de ejemplo
 al arrancar **solo si la tabla está vacía**: reiniciarla no duplica datos ni pisa lo que hayas
 creado desde la aplicación. Con `SEED_ON_BOOT=false` no siembra nada.
 
@@ -132,3 +133,19 @@ El seeder reusa el caso de uso `CreatePost`, así que los datos iniciales pasan 
 reglas y el mismo summarizer que un post creado desde la UI: los resúmenes no se escriben a
 mano en ningún lado. Los datos viven en
 [`initial-posts.ts`](apps/api/src/modules/posts/infrastructure/seed/initial-posts.ts).
+
+## Frontend
+
+Pantalla única con las cuatro funcionalidades del challenge:
+
+- **Crear** — formulario de nombre y descripción; el resumen lo genera el backend.
+- **Listar** — tabla con nombre, fecha, descripción y el resumen generado.
+- **Eliminar** — acción por fila, que actualiza el estado sin recargar la lista.
+- **Filtrar** — búsqueda **local** por nombre, sin llamar al API, con el contador
+  `visibles de total`.
+
+El estado vive en un slice de Redux Toolkit
+([`posts.slice.ts`](apps/web/src/app/posts/posts.slice.ts)) con thunks para las tres
+operaciones; el filtro es un selector memoizado sobre lo que ya está en el store. Todas las
+llamadas pasan por [`apiFetch`](apps/web/src/lib/api-client.ts), que resuelve la base desde
+`VITE_API_URL` (en compose queda `/api`, el mismo origen que sirve nginx).

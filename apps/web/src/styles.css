@@ -1,1 +1,244 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --border: #dcdfe4;
+  --text: #1c2430;
+  --muted: #6b7480;
+  --accent: #1f5eff;
+  --danger: #c2352c;
+  --ok: #1f7a4d;
+  --radius: 8px;
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+main {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+h2 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+
+.badge {
+  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.badge.ok {
+  color: var(--ok);
+  border-color: currentcolor;
+}
+
+.badge.error {
+  color: var(--danger);
+  border-color: currentcolor;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  width: 100%;
+}
+
+textarea {
+  resize: vertical;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+button {
+  font: inherit;
+  font-weight: 600;
+  padding: 8px 14px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+form.card button[type='submit'] {
+  align-self: flex-start;
+  margin-top: 8px;
+}
+
+button.danger {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--danger);
+}
+
+.filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.filter label {
+  flex: none;
+}
+
+.filter input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.filter button {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.count {
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th,
+td {
+  text-align: left;
+  vertical-align: top;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+td .date {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+td.summary {
+  color: var(--muted);
+}
+
+.empty {
+  color: var(--muted);
+  padding: 16px 0;
+  margin: 0;
+}
+
+.error {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--danger);
+  background: #fdf1f0;
+  color: var(--danger);
+}
+
+@media (max-width: 720px) {
+  table,
+  thead,
+  tbody,
+  tr,
+  th,
+  td {
+    display: block;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    padding: 8px 0;
+  }
+
+  td {
+    border: none;
+    padding: 4px 0;
+  }
+}
