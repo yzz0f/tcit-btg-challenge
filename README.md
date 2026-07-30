@@ -121,3 +121,14 @@ curl -X POST http://localhost:3000/api/posts \
   palabras clave más frecuentes. Cambiarlo por un LLM implica un adaptador nuevo del puerto.
 - El esquema lo definen las **migraciones de TypeORM** (`synchronize` está desactivado) y se
   aplican al arrancar la API, así que el contenedor queda listo sin pasos manuales.
+
+## Datos iniciales (seeder)
+
+Con `SEED_ON_BOOT=true` (valor por defecto en compose), la API carga cuatro posts de ejemplo
+al arrancar **solo si la tabla está vacía**: reiniciarla no duplica datos ni pisa lo que hayas
+creado desde la aplicación. Con `SEED_ON_BOOT=false` no siembra nada.
+
+El seeder reusa el caso de uso `CreatePost`, así que los datos iniciales pasan por las mismas
+reglas y el mismo summarizer que un post creado desde la UI: los resúmenes no se escriben a
+mano en ningún lado. Los datos viven en
+[`initial-posts.ts`](apps/api/src/modules/posts/infrastructure/seed/initial-posts.ts).
