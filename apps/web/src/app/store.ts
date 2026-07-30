@@ -1,11 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { healthReducer } from './health/health.slice';
+import { postsReducer } from './posts/posts.slice';
 
 export const createStore = () =>
   configureStore({
     reducer: {
       health: healthReducer,
-      // El slice `posts` se añade en la fase 5.
+      posts: postsReducer,
     },
   });
 
