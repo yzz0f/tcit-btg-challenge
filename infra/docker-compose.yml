@@ -58,6 +58,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:?falta DB_PASSWORD en .env}
       DB_NAME: ${DB_NAME:-btg_posts}
       WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost:8080}
+      SEED_ON_BOOT: ${SEED_ON_BOOT:-true}
     ports:
       - '${API_PORT:-3000}:3000'
     healthcheck:

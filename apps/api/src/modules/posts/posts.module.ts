@@ -8,6 +8,7 @@ import { SummarizerPort } from './domain/summarizer.port';
 import { PostsController } from './infrastructure/http/posts.controller';
 import { PostOrmEntity } from './infrastructure/persistence/post.orm-entity';
 import { TypeOrmPostRepository } from './infrastructure/persistence/typeorm-post.repository';
+import { PostsSeeder } from './infrastructure/seed/posts.seeder';
 import { KeywordSummarizer } from './infrastructure/summarizer/keyword.summarizer';
 
 /** Une los puertos del dominio con sus adaptadores concretos. */
@@ -18,8 +19,10 @@ import { KeywordSummarizer } from './infrastructure/summarizer/keyword.summarize
     CreatePost,
     ListPosts,
     DeletePost,
+    PostsSeeder,
     { provide: PostRepositoryPort, useClass: TypeOrmPostRepository },
     { provide: SummarizerPort, useClass: KeywordSummarizer },
   ],
+  exports: [PostsSeeder],
 })
 export class PostsModule {}
