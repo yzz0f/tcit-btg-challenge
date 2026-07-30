@@ -1,26 +1,26 @@
 /**
  * Contrato del recurso Post, compartido entre el API y el frontend.
- * Los campos del challenge son: nombre, descripcion, resumen y fechaCreacion.
+ * Corresponde a los 4 campos del challenge: nombre, descripción, resumen y fecha de creación.
  */
 export interface Post {
   id: string;
-  nombre: string;
-  descripcion: string;
+  name: string;
+  description: string;
   /** Resumen generado automáticamente a partir de la descripción. */
-  resumen: string;
+  summary: string;
   /** ISO 8601. */
-  fechaCreacion: string;
+  createdAt: string;
 }
 
 /** Payload aceptado por `POST /api/posts`. */
-export interface CreatePostInput {
-  nombre: string;
-  descripcion: string;
+export interface CreatePostDto {
+  name: string;
+  description: string;
 }
 
 /** Límites de validación, compartidos por el DTO del API y el formulario web. */
 export const POST_LIMITS = {
-  nombreMaxLength: 120,
-  descripcionMaxLength: 5000,
-  resumenMaxLength: 280,
+  nameMaxLength: 120,
+  descriptionMaxLength: 5000,
+  summaryMaxLength: 280,
 } as const;
