@@ -7,8 +7,10 @@ import { createStore } from './store';
 const post = {
   id: '11111111-1111-4111-8111-111111111111',
   name: 'Matrix',
-  description: 'Tomas la pastilla azul y la historia termina.',
-  summary: 'Tomas la pastilla azul y la historia termina. Palabras clave: pastilla, tomas',
+  // Descripción y resumen distintos a propósito: la tabla muestra solo la descripción.
+  description: 'Tomas la pastilla azul y la historia termina; tomas la roja y sigue.',
+  summary: 'RESUMEN-GENERADO',
+  keywords: ['PALABRA-CLAVE'],
   createdAt: '2026-07-29T12:00:00.000Z',
 };
 
@@ -46,13 +48,26 @@ function renderApp() {
 describe('App', () => {
   afterEach(() => vi.restoreAllMocks());
 
-  it('lista los posts con su resumen y marca el API como conectada', async () => {
+  it('lista los posts y marca el API como conectada', async () => {
     stubApi();
     renderApp();
 
     expect(await screen.findByText('Matrix')).toBeTruthy();
-    expect(screen.getAllByText(/Palabras clave: pastilla, tomas/)).toHaveLength(2);
     expect(screen.getByText('API conectada')).toBeTruthy();
+  });
+
+  it('no muestra el resumen ni las palabras clave en la tabla', async () => {
+    stubApi();
+    renderApp();
+    await screen.findByText('Matrix');
+
+    expect(screen.queryByText(/RESUMEN-GENERADO/)).toBeNull();
+    expect(screen.queryByText(/PALABRA-CLAVE/)).toBeNull();
+    expect(screen.getAllByRole('columnheader').map((th) => th.textContent)).toEqual([
+      'Nombre',
+      'Descripción',
+      'Acción',
+    ]);
   });
 
   it('filtra localmente por nombre', async () => {

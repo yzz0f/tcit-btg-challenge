@@ -16,6 +16,7 @@ function post(id: string, name: string): Post {
     name,
     description: 'Contenido',
     summary: 'Resumen',
+    keywords: ['clave'],
     createdAt: '2026-07-29T12:00:00.000Z',
   };
 }
