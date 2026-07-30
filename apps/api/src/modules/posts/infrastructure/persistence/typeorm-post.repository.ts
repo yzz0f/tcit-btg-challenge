@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { KEYWORDS_SEPARATOR } from '@tcit/shared';
 import { Repository } from 'typeorm';
 import { Post } from '../../domain/post';
 import { PostRepositoryPort } from '../../domain/post-repository.port';
@@ -36,6 +37,7 @@ export class TypeOrmPostRepository extends PostRepositoryPort {
     row.name = post.name;
     row.description = post.description;
     row.summary = post.summary;
+    row.keywords = post.keywords.join(KEYWORDS_SEPARATOR);
     row.createdAt = post.createdAt;
 
     return row;
@@ -48,7 +50,16 @@ export class TypeOrmPostRepository extends PostRepositoryPort {
       name: row.name,
       description: row.description,
       summary: row.summary,
+      keywords: this.toKeywords(row.keywords),
       createdAt: row.createdAt,
     });
+  }
+
+  /** La columna guarda las palabras clave unidas por coma; el dominio las usa como lista. */
+  private toKeywords(stored: string | null): string[] {
+    return (stored ?? '')
+      .split(KEYWORDS_SEPARATOR)
+      .map((keyword) => keyword.trim())
+      .filter(Boolean);
   }
 }
