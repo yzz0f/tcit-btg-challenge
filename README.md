@@ -7,7 +7,12 @@ eliminar y filtrar). Persistencia en SQL Server, todo ejecutable en contenedores
 
 ```
 apps/
-  api/       NestJS — arquitectura hexagonal (dominio / aplicación / infraestructura)
+  api/       NestJS — arquitectura hexagonal
+    src/modules/posts/
+      domain/           Post, puertos (repositorio, summarizer) y errores de dominio
+      application/      casos de uso: CreatePost, ListPosts, DeletePost
+      infrastructure/   repositorio TypeORM, summarizer, controlador y DTOs
+    src/migrations/     migraciones de TypeORM
   web/       Vite + React + Redux Toolkit
 packages/
   shared/    @tcit/shared — tipos y contratos compartidos entre api y web
@@ -82,11 +87,37 @@ del frontend en compose (`WEB_PORT`).
 
 ## API
 
-| Método   | Ruta             | Descripción                      |
-| -------- | ---------------- | -------------------------------- |
-| `GET`    | `/api/health`    | Estado del servicio              |
-| `GET`    | `/api/posts`     | Lista los posts                  |
-| `POST`   | `/api/posts`     | Crea un post (genera el resumen) |
-| `DELETE` | `/api/posts/:id` | Elimina un post                  |
+| Método   | Ruta             | Respuesta                                               |
+| -------- | ---------------- | ------------------------------------------------------- |
+| `GET`    | `/api/health`    | `200` — estado del servicio                             |
+| `GET`    | `/api/posts`     | `200` — posts del más reciente al más antiguo           |
+| `POST`   | `/api/posts`     | `201` — post creado; `400` si el payload no es válido   |
+| `DELETE` | `/api/posts/:id` | `204`; `404` si no existe; `400` si el id no es un UUID |
 
-> Los endpoints de `posts` se implementan sobre el módulo hexagonal de `apps/api`.
+Ejemplo de creación:
+
+```bash
+curl -X POST http://localhost:3000/api/posts \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Despliegue","description":"El despliegue usa contenedores en la nube."}'
+```
+
+```json
+{
+  "id": "349c31d4-b364-46bc-bed9-2c7bf450c736",
+  "name": "Despliegue",
+  "description": "El despliegue usa contenedores en la nube.",
+  "summary": "El despliegue usa contenedores en la nube. Palabras clave: contenedores, despliegue, nube",
+  "createdAt": "2026-07-30T03:03:49.688Z"
+}
+```
+
+## Dominio y persistencia
+
+- El módulo `posts` sigue una **arquitectura hexagonal**: los casos de uso dependen de los
+  puertos `PostRepositoryPort` y `SummarizerPort`, y los adaptadores concretos
+  (`TypeOrmPostRepository`, `KeywordSummarizer`) se enchufan en `posts.module.ts`.
+- El `summary` se genera solo al crear el post: primera oración de la descripción más las
+  palabras clave más frecuentes. Cambiarlo por un LLM implica un adaptador nuevo del puerto.
+- El esquema lo definen las **migraciones de TypeORM** (`synchronize` está desactivado) y se
+  aplican al arrancar la API, así que el contenedor queda listo sin pasos manuales.
